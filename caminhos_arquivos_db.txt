@@ -1,0 +1,1 @@
+recursos\Contador_OCR.db
