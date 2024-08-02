@@ -81,10 +81,10 @@ ix, iy = -1, -1
 confidence_threshold = 0.3
 
 # Dicionário de nomes de classes
-class_names = {2: "car", 3: "motorcycle", 5: "bus", 7: "truck"}
+class_names = {2: "car", 3: "motorcycle", 5: "bus", 7: "truck", 1: "bicycle"}
 
 # Inicializar contadores de veículos
-vehicle_count = {"car": 0, "motorcycle": 0, "bus": 0, "truck": 0}
+vehicle_count = {"car": 0, "motorcycle": 0, "bus": 0, "truck": 0, "bicycle": 0}
 
 # Inicializar um dicionário para rastrear veículos contados
 tracked_vehicles = {}
@@ -113,7 +113,7 @@ def draw_roi(event, x, y, flags, param):
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
         roi_x, roi_y, roi_w, roi_h = ix, iy, x - ix, y - iy
-        vehicle_count = {"car": 0, "motorcycle": 0, "bus": 0, "truck": 0}
+        vehicle_count = {"car": 0, "motorcycle": 0, "bus": 0, "truck": 0, "bicycle": 0}
         tracked_vehicles = {}
         print(f"ROI definida: x={roi_x}, y={roi_y}, w={roi_w}, h={roi_h}")
 
@@ -124,8 +124,8 @@ cv2.setMouseCallback('Video', draw_roi)
 def enviar_informacoes_para_banco():
     global last_db_update_time
     data_atual = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    comando_sql = "INSERT INTO Contador_De_Veiculos (CAR, MOTORCYCLE, BUS, TRUCK, DATA_INICIO, DATA_FIM) VALUES (?, ?, ?, ?, ?, ?);"
-    cur.execute(comando_sql, (vehicle_count["car"], vehicle_count["motorcycle"], vehicle_count["bus"], vehicle_count["truck"], last_db_update_time, data_atual))
+    comando_sql = "INSERT INTO Contador_De_Veiculos (CAR, MOTORCYCLE, BUS, TRUCK, BICYCLE, DATA_INICIO, DATA_FIM) VALUES (?, ?, ?, ?, ?, ?, ?);"
+    cur.execute(comando_sql, (vehicle_count["car"], vehicle_count["motorcycle"], vehicle_count["bus"], vehicle_count["truck"], vehicle_count["bicycle"], last_db_update_time, data_atual))
     con.commit()
     last_db_update_time = data_atual
     print("Informações enviadas para o banco de dados SQLite.")
@@ -138,7 +138,7 @@ def agendar_envio_dados():
 # Função para resetar a contagem de veículos
 def reset_vehicle_count():
     global vehicle_count
-    vehicle_count = {"car": 0, "motorcycle": 0, "bus": 0, "truck": 0}
+    vehicle_count = {"car": 0, "motorcycle": 0, "bus": 0, "truck": 0, "bicycle": 0}
 
 # Agendar a função para ser executada a cada 5 minutos
 schedule.every(0.5).minutes.do(agendar_envio_dados)
